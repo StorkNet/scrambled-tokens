@@ -9,10 +9,10 @@ class LagrangePoly:
         self.D_Y = []
 
         for i in range(self.n):
-            challenge = 1
-            while self.X[i] % challenge == 0:
-                challenge = self.randNum()
-            self.D_Y.append(challenge)
+            randChallenge = 1
+            while self.X[i] % randChallenge == 0:
+                randChallenge = self.randNum()
+            self.D_Y.append(randChallenge)
 
         self.F_Y = np.ones(len(X), dtype=int)
 
@@ -42,6 +42,9 @@ class LagrangePoly:
             Fy = 0
 
         return (np.sum(Dy, axis=0) * Fy)[0]
+
+    def challenge(self, x, y):
+        return 1 if y == self.interpolate(x) else 0
 
 '''
 X = [0x6be986730E72fCd23910D66A1722b4b3611e50D2, 0x07F20B1265059fEb39D605e8476aa51595483Ec6, 0x5F45498761247C2A4609d66E633959e0f9999999, 0x1ab07e29D2ec76117704944DfBDB9dE5b785E8f4, 0xD3358467C97906bA732d0ca4af20f14F0424CD4F]
