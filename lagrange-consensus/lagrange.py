@@ -1,5 +1,11 @@
 import numpy as np
 
+# Define a function :
+# LagrangePolynomial(x) = F(x).D(x) = challengeBit(x)
+# where F(x) is the Lagrange polynomial
+# and D(x) is the test if the public address is a member of the polynomial
+# challengeBit(x) is the randomly generated bit used as key for the user to claim the tokens
+
 class LagrangePolynomial:
 
     def __init__(self, X):
@@ -9,15 +15,12 @@ class LagrangePolynomial:
         self.D_Y = []
 
         for i in range(self.n):
-            randChallenge = 1
-            while self.X[i] % randChallenge == 0:
-                randChallenge = self.randNum()
-            self.D_Y.append(randChallenge)
+            key = 1
+            while self.X[i] % key == 0:
+                key = self.randNum()
+            self.D_Y.append(key)
 
         assert(len(X) == len(self.D_Y))
-
-    def randNum(self) -> np.ndarray:
-        return np.random.randint(low=0xFF, high=0xFFFF, size=1, dtype=int)
 
     def Dx(self, x, j) -> np.ndarray:
         b = [(x - self.X[m]) / (self.X[j] - self.X[m])
@@ -34,11 +37,15 @@ class LagrangePolynomial:
 
         return int(abs(Dy * Fy)[0])
 
-    def challenge(self, x, y) -> int:
+    def finalize(self, x, y) -> int:
         if y != 0 :
             return 1 if self.returnChallenge(x) == y else 0
         else:
             return 0
+
+    def randNum(self) -> np.ndarray:
+        return np.random.randint(low=0xFF, high=0xFFFF, size=1, dtype=int)
+
 
 
 '''
