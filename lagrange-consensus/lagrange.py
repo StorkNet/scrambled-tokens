@@ -51,7 +51,6 @@ class LagrangePolynomial:
 
     # returns the key for a public address
     def returnKey(self, x) -> int:
-        x = self.returnGroupAddress(x)
         Dy = np.sum([self.__Dx(x, j) for j in range(self.n)], axis=0)
         Fy = np.sum([self.__Fx(x, j) for j in range(self.n)], axis=0)
 
