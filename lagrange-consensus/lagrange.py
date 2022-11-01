@@ -8,13 +8,13 @@ import numpy as np
 
 class LagrangePolynomial:
 
-    def __init__(self, X, alpha):
+    def __init__(self, X):
         self.n = len(X)
-
+        self.alpha = 131
         self.X = np.zeros(self.n)
         self.__D_Y = np.zeros(self.n)
 
-        self.__groupAddresses = {}
+        self.__groupAddressMapping = {}
 
         key = 1
         ctr = 0
@@ -26,11 +26,11 @@ class LagrangePolynomial:
             modAddr = address % key
 
             # finding the group element of the address
-            groupAddr = alpha ** modAddr % key
+            groupAddr = self.alpha ** modAddr % key
 
             self.X[ctr] = groupAddr
             self.__D_Y[ctr] = key
-            self.__groupAddresses[address] = groupAddr
+            self.__groupAddressMapping[address] = groupAddr
             ctr += 1
 
         assert(len(X) == len(self.__D_Y))
@@ -43,14 +43,17 @@ class LagrangePolynomial:
         return np.prod(b, axis=0) * self.__D_Y[j]
 
     # returns 1 or 0 if the public address is a member of the polynomial
-    def __Fx(self, Dy) -> int:
-        return 1 if Dy/int(Dy) == 1 else 0
+    def __Fx(self, x, j) -> int:
+        b = [(x - self.X[m]) / (self.X[j] - self.X[m])
+             for m in range(self.n) if m != j]
+
+        return np.prod(b, axis=0) * self.__D_Y[j]
 
     # returns the key for a public address
     def returnKey(self, x) -> int:
         x = self.returnGroupAddress(x)
         Dy = np.sum([self.__Dx(x, j) for j in range(self.n)], axis=0)
-        Fy = self.__Fx(Dy)
+        Fy = np.sum([self.__Fx(x, j) for j in range(self.n)], axis=0)
 
         return int(abs(Dy * Fy))
 
@@ -63,7 +66,7 @@ class LagrangePolynomial:
 
     # returns a random number
     def __randNum(self) -> np.ndarray:
-        return np.random.randint(low=0xFF, high=0xFFFF, size=1, dtype=int)
+        return np.random.randint(low=0xF001, high=0xFFFF, size=1, dtype=int)
 
-    def returnGroupAddress(self, x) -> float:
-        return self.__groupAddresses[x][0]
+    def returnGroupAddress(self, x) -> int:
+        return self.__groupAddressMapping[x][0]
