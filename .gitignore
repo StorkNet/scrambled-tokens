@@ -1,2 +1,3 @@
 .vscode
 lagrange-consensus/__pycache__
+*/*_test.py
