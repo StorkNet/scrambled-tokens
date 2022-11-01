@@ -24,7 +24,9 @@ class LagrangePolynomial:
                 key = self.__randNum()
 
             modAddr = address % key
-            groupAddr = alpha ** (modAddr) % key
+
+            # finding the group element of the address
+            groupAddr = alpha ** modAddr % key
 
             self.X[ctr] = groupAddr
             self.__D_Y[ctr] = key
