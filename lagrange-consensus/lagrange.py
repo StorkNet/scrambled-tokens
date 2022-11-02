@@ -1,4 +1,3 @@
-from hashlib import sha256
 import numpy as np
 from math import ceil
 from hashlib import sha256
@@ -12,29 +11,27 @@ from hashlib import sha256
 class LagrangePolynomial:
 
     def __init__(self, X):
-        self.n = len(X)
         self.alpha = 131
-        self.X = np.zeros(self.n)
-        self.__D_Y = np.zeros(self.n)
-        self.__F_Y = np.ones(self.n)
+        self.p = self.__randNum()
+
+        self.n = len(X)
+
+        self.X = np.zeros(self.n, dtype=float)
+        self.__D_Y = np.zeros(self.n, dtype=float)
+        self.__F_Y = np.ones(self.n, dtype=float)
 
         self.__groupAddressMapping = {}
 
-        key = 1
         ctr = 0
         for address in X:
-            key = self.__randNum()
-            while address % key == 0:
-                key = self.__randNum()
-
-            modAddr = address % key
+            modAddr = address % self.p
 
             # finding the group element of the address
-            groupAddr = self.alpha ** modAddr % key
+            groupAddr = self.alpha ** modAddr % self.p
 
             self.X[ctr] = groupAddr
-            self.__D_Y[ctr] = key
             self.__groupAddressMapping[address] = groupAddr
+            self.__D_Y[ctr] = int(self.__randNum() * 2 ** 40)
             ctr += 1
 
         assert(len(X) == len(self.__D_Y))
@@ -54,24 +51,27 @@ class LagrangePolynomial:
         return np.prod(b, axis=0) * self.__F_Y[j]
 
     # returns the key for a public address
-    def returnKey(self, x):
-        Dy = np.sum([self.__Dx(x, j) for j in range(self.n)], axis=0)
-        Fy = np.sum([self.__Fx(x, j) for j in range(self.n)], axis=0)
+    def returnKey(self, groupAddress):
+        Dy = np.sum([self.__Dx(groupAddress, j) for j in range(self.n)], axis=0)
+        Fy = np.sum([self.__Fx(groupAddress, j) for j in range(self.n)], axis=0)
         # Fy = 1 - ceil((1/(1 + 2**(-Fy)) - 0.5))
         # return Fy
         n = int(abs(Dy * Fy) * 2 ** 40)
-        return sha256(str(n ^ x).encode()).hexdigest()
+        return self.generateKey(n, groupAddress)
 
     # returns if the public address matched with the right key
-    def finalize(self, x, y) -> int:
-        if y != 0 :
-            return 1 if self.returnKey(x) == y else 0
+    def finalize(self, groupAddress, y) -> int:
+        if y != 0:
+            return 1 if self.returnKey(groupAddress) == y else 0
         else:
             return 0
 
     # returns a random number
     def __randNum(self) -> np.ndarray:
         return np.random.randint(low=0xF001, high=0xFFFF, size=1, dtype=int)
+
+    def generateKey(self, key, groupAddress) -> str:
+        return sha256(str(int(key) ^ int(groupAddress)).encode()).hexdigest()
 
     def returnGroupAddress(self, x) -> int:
         return self.__groupAddressMapping[x][0]
