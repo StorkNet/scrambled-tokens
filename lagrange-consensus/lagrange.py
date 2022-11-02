@@ -51,13 +51,11 @@ class LagrangePolynomial:
         return np.prod(b, axis=0) * self.__F_Y[j]
 
     # returns the key for a public address
-    def returnKey(self, groupAddress) -> str:
+    def returnKey(self, groupAddress) -> int:
         Dy = np.sum([self.__Dx(groupAddress, j) for j in range(self.n)], axis=0)
-        Fy = np.sum([self.__Fx(groupAddress, j) for j in range(self.n)], axis=0)
-        # Fy = 1 - ceil((1/(1 + 2**(-Fy)) - 0.5))
-        # return Fy
-        n = int(abs(Dy * Fy) * 2 ** 40)
-        return self.generateKey(n, groupAddress)
+        Fy = np.sum([self.__Fx(groupAddress, j) for j in range(self.n)], axis=0) * 2 ** 40
+        Fy = 1 - ceil((1/(1 + 2**(-ceil(Fy % 2**40))) - 0.5))
+        return Fy
 
     # returns if the public address matched with the right key
     def finalize(self, groupAddress, y) -> int:
