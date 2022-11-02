@@ -18,10 +18,10 @@ lp = lagrange.LagrangePolynomial(X)
 
 def FinalizeTest():
     for x in X:
-        print("Testing address: 0x%x" % x)
-        print("Group address: 0x%x" % lp.returnGroupAddress(x))
-        print("Key: 0x%x" % lp.returnKey(x))
-        print("Finalize: %d" % lp.finalize(x, lp.returnKey(lp.returnGroupAddress(0x6be986730E72fCd23910D66A1722b4b3611e50D2))))
-        print("")
+        # print("Testing address: 0x%x" % x)
+        # print("Group address: 0x%x" % lp.returnGroupAddress(x))
+        # print("Key: 0x%s" % lp.returnKey(lp.returnGroupAddress(x)))
+        # print("Finalize: %d" % lp.finalize(lp.returnGroupAddress(x), lp.returnKey(lp.returnGroupAddress(x))))
+        # print("")
         assert(lp.finalize(x, lp.returnKey(x)) == 1)
     print("All addresses finalized with 1")
