@@ -64,7 +64,7 @@ class LagrangePolynomial:
 
     # returns if the public address matched with the right key
     def finalize(self, groupAddress, y) -> int:
-        if y != 0:
+        if y != ''.zfill(64):
             return 1 if self.returnKey(groupAddress) == y else 0
         else:
             return 0
