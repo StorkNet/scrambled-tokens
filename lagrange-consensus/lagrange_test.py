@@ -23,5 +23,5 @@ def FinalizeTest():
         # print("Key: 0x%s" % lp.returnKey(lp.returnGroupAddress(x)))
         # print("Finalize: %d" % lp.finalize(lp.returnGroupAddress(x), lp.returnKey(lp.returnGroupAddress(x))))
         # print("")
-        assert(lp.finalize(x, lp.returnKey(x)) == 1)
+        assert(lp.finalize(lp.returnGroupAddress(x), lp.returnKey(lp.returnGroupAddress(x))) == 1)
     print("All addresses finalized with 1")
