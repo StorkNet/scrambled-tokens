@@ -13,7 +13,7 @@ class LagrangePolynomial:
     def __init__(self, X):
         self.alpha = 131
         self.p = self.__randNum()
-
+        self.scale = 2**80
         self.n = len(X)
 
         self.X = np.zeros(self.n, dtype=float)
@@ -31,7 +31,7 @@ class LagrangePolynomial:
 
             self.X[ctr] = groupAddr
             self.__groupAddressMapping[address] = groupAddr
-            self.__D_Y[ctr] = int(self.__randNum() * 2 ** 40)
+            self.__D_Y[ctr] = int(self.__randNum() * self.scale)
             ctr += 1
 
         assert(len(X) == len(self.__D_Y))
@@ -51,11 +51,16 @@ class LagrangePolynomial:
         return np.prod(b, axis=0) * self.__F_Y[j]
 
     # returns the key for a public address
-    def returnKey(self, groupAddress) -> int:
+    # MAKE THE KEY LARGER SO THERE ARE NO COLLISIONS
+    def returnKey(self, groupAddress):
         Dy = np.sum([self.__Dx(groupAddress, j) for j in range(self.n)], axis=0)
-        Fy = np.sum([self.__Fx(groupAddress, j) for j in range(self.n)], axis=0) * 2 ** 40
-        Fy = 1 - ceil((1/(1 + 2**(-ceil(Fy % 2**40))) - 0.5))
-        return Fy
+        Fy = int(groupAddress in self.X)
+        # Fy = (np.sum([self.__Fx(groupAddress, j) for j in range(
+        #     self.n)], axis=0))
+        # Fy1 = sha256(str((Fy ^ self.scale)).encode()).hexdigest()
+        # Fy = 1 - ceil((1/(1 + 2**(-ceil(Fy % self.scale))) - 0.5))
+        # return (Fy, int(Fy * self.scale))
+        return (self.generateKey(Dy, groupAddress) * Fy).zfill(64)
 
     # returns if the public address matched with the right key
     def finalize(self, groupAddress, y) -> int:
