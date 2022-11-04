@@ -18,8 +18,8 @@ class LagrangePolynomial:
         self.n = len(X)
 
         self.X = []
-        self.__D_Y = np.zeros(self.n, dtype=float)
-        self.__F_Y = np.ones(self.n, dtype=float)
+        self.__D_Y = []
+        self.__F_Y = np.ones(self.n, dtype=int)
 
         self.__storkAddressMapping = {}
 
@@ -29,7 +29,8 @@ class LagrangePolynomial:
             self.X.append(storkAddr)
             # self.X[ctr] = storkAddr
             self.__storkAddressMapping[address] = storkAddr
-            self.__D_Y[ctr] = int(self.__randNum() * self.scale)
+            self.__D_Y.append(int(self.__randNum() * self.scale))
+            # self.__D_Y[ctr] = int(self.__randNum() * self.scale)
             ctr += 1
 
         assert(len(X) == len(self.__D_Y))
@@ -53,9 +54,9 @@ class LagrangePolynomial:
     def returnKey(self, storkAddress):
         Dy = np.sum([self.__Dx(storkAddress, j) for j in range(self.n)], axis=0)
         Fy = int(storkAddress in self.X)
-        # Fy = (np.sum([self.__Fx(storkAddress, j) for j in range(
+        # Fy = int(np.sum([self.__Fx(storkAddress, j) for j in range(
         #     self.n)], axis=0))
-        # Fy1 = sha256(str((Fy ^ self.scale)).encode()).hexdigest()
+        # Fy1 = sha256(str((Fy ^ int(self.scale))).encode()).hexdigest()
         # Fy = 1 - ceil((1/(1 + 2**(-ceil(Fy % self.scale))) - 0.5))
         # return (Fy, int(Fy * self.scale))
         return (self.generateKey(Dy, storkAddress) * Fy).zfill(64)
