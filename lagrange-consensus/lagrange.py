@@ -1,6 +1,5 @@
 import numpy as np
 import secp256k1
-
 from math import ceil
 from hashlib import sha256
 
@@ -18,7 +17,7 @@ class LagrangePolynomial:
         self.scale = 2**80
         self.n = len(X)
 
-        self.X = np.zeros(self.n, dtype=float)
+        self.X = []
         self.__D_Y = np.zeros(self.n, dtype=float)
         self.__F_Y = np.ones(self.n, dtype=float)
 
@@ -27,7 +26,8 @@ class LagrangePolynomial:
         ctr = 0
         for address in X:
             groupAddr = int(secp256k1.generateKey(address), 16)
-            self.X[ctr] = groupAddr
+            self.X.append(groupAddr)
+            # self.X[ctr] = groupAddr
             self.__groupAddressMapping[address] = groupAddr
             self.__D_Y[ctr] = int(self.__randNum() * self.scale)
             ctr += 1
@@ -75,4 +75,4 @@ class LagrangePolynomial:
         return sha256(str(int(key) ^ int(groupAddress)).encode()).hexdigest()
 
     def returnGroupAddress(self, x) -> int:
-        return self.__groupAddressMapping[x][0]
+        return self.__groupAddressMapping[x]
