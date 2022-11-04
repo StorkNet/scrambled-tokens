@@ -16,7 +16,7 @@ X_attack = [0x1ab07e29D2ec76117704944DfBDB9dE5b785E8f4,
             0xD3358467C97906bA732d0ca4af20f14F0424CD4F]
 
 print("Initializing lagrange object")
-alpha = 131
+alpha = randNum()
 lp = lagrange.LagrangePolynomial(X_honest)
 
 # def ModAddressTest():
