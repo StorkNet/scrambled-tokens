@@ -1,4 +1,6 @@
 import numpy as np
+import secp256k1
+
 from math import ceil
 from hashlib import sha256
 
@@ -11,7 +13,7 @@ from hashlib import sha256
 class LagrangePolynomial:
 
     def __init__(self, X):
-        self.alpha = 131
+        self.alpha = self.__randNum()
         self.p = self.__randNum()
         self.scale = 2**80
         self.n = len(X)
@@ -24,11 +26,7 @@ class LagrangePolynomial:
 
         ctr = 0
         for address in X:
-            modAddr = address % self.p
-
-            # finding the group element of the address
-            groupAddr = self.alpha ** modAddr % self.p
-
+            groupAddr = int(secp256k1.generateKey(address), 16)
             self.X[ctr] = groupAddr
             self.__groupAddressMapping[address] = groupAddr
             self.__D_Y[ctr] = int(self.__randNum() * self.scale)
