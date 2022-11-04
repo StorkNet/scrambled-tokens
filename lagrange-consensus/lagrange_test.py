@@ -29,11 +29,11 @@ lp = lagrange.LagrangePolynomial(X_honest)
 def FinalizeTest():
     for x_honest in X_honest:
         print("Testing address: 0x%x" % x_honest)
-        print("Group address: 0x%x" % lp.returnGroupAddress(x_honest))
-        print("Key: 0x%s" % lp.returnKey(lp.returnGroupAddress(x_honest)))
+        print("Group address: 0x%x" % lp.returnStorkAddress(x_honest))
+        print("Key: 0x%s" % lp.returnKey(lp.returnStorkAddress(x_honest)))
         print("")
-        assert(lp.finalize(lp.returnGroupAddress(x_honest),
-               lp.returnKey(lp.returnGroupAddress(x_honest))) == 1)
+        assert(lp.finalize(lp.returnStorkAddress(x_honest),
+               lp.returnKey(lp.returnStorkAddress(x_honest))) == 1)
 
     for x_attack in X_attack:
         print("Testing address: 0x%x" % x_attack)
