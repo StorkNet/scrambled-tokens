@@ -21,14 +21,14 @@ class LagrangePolynomial:
         self.__D_Y = np.zeros(self.n, dtype=float)
         self.__F_Y = np.ones(self.n, dtype=float)
 
-        self.__groupAddressMapping = {}
+        self.__storkAddressMapping = {}
 
         ctr = 0
         for address in X:
-            groupAddr = int(secp256k1.generateKey(address), 16)
-            self.X.append(groupAddr)
-            # self.X[ctr] = groupAddr
-            self.__groupAddressMapping[address] = groupAddr
+            storkAddr = int(secp256k1.generateStorkAddress(address), 16)
+            self.X.append(storkAddr)
+            # self.X[ctr] = storkAddr
+            self.__storkAddressMapping[address] = storkAddr
             self.__D_Y[ctr] = int(self.__randNum() * self.scale)
             ctr += 1
 
@@ -50,20 +50,20 @@ class LagrangePolynomial:
 
     # returns the key for a public address
     # MAKE THE KEY LARGER SO THERE ARE NO COLLISIONS
-    def returnKey(self, groupAddress):
-        Dy = np.sum([self.__Dx(groupAddress, j) for j in range(self.n)], axis=0)
-        Fy = int(groupAddress in self.X)
-        # Fy = (np.sum([self.__Fx(groupAddress, j) for j in range(
+    def returnKey(self, storkAddress):
+        Dy = np.sum([self.__Dx(storkAddress, j) for j in range(self.n)], axis=0)
+        Fy = int(storkAddress in self.X)
+        # Fy = (np.sum([self.__Fx(storkAddress, j) for j in range(
         #     self.n)], axis=0))
         # Fy1 = sha256(str((Fy ^ self.scale)).encode()).hexdigest()
         # Fy = 1 - ceil((1/(1 + 2**(-ceil(Fy % self.scale))) - 0.5))
         # return (Fy, int(Fy * self.scale))
-        return (self.generateKey(Dy, groupAddress) * Fy).zfill(64)
+        return (self.generateKey(Dy, storkAddress) * Fy).zfill(64)
 
     # returns if the public address matched with the right key
-    def finalize(self, groupAddress, y) -> int:
+    def finalize(self, storkAddress, y) -> int:
         if y != ''.zfill(64):
-            return 1 if self.returnKey(groupAddress) == y else 0
+            return 1 if self.returnKey(storkAddress) == y else 0
         else:
             return 0
 
@@ -71,8 +71,8 @@ class LagrangePolynomial:
     def __randNum(self) -> np.ndarray:
         return np.random.randint(low=0xF001, high=0xFFFF, size=1, dtype=int)
 
-    def generateKey(self, key, groupAddress) -> str:
-        return sha256(str(int(key) ^ int(groupAddress)).encode()).hexdigest()
+    def generateKey(self, key, storkAddress) -> str:
+        return sha256(str(int(key) ^ int(storkAddress)).encode()).hexdigest()
 
-    def returnGroupAddress(self, x) -> int:
-        return self.__groupAddressMapping[x]
+    def returnStorkAddress(self, x) -> int:
+        return self.__storkAddressMapping[x]
